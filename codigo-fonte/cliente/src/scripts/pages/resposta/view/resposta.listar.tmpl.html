@@ -1,0 +1,64 @@
+        <div class="m-b-20" layout="row" layout-xs="column">
+            <div class="sgr-container-table" layout="column" flex-gt-xs flex="100">
+                <md-card>
+                    <md-table-container>
+                        <table md-table>
+                            <thead md-head>
+                            <tr md-row>
+                                <th md-column class="text-center" width="60px">
+                                    <sgr-glossario termo="Item"></sgr-glossario>
+                                </th>
+                                <th md-column>
+                                    <sgr-glossario termo="Evento de Risco"></sgr-glossario>
+                                </th>
+                                <th md-column class="text-center" width="130px">
+                                    <sgr-glossario termo="Probabilidade x Impacto"></sgr-glossario>
+                                </th>
+                                <th md-column width="130px">
+                                    <sgr-glossario termo="Nível de Risco"></sgr-glossario>
+                                </th>
+                                <th md-column width="130px">
+                                    <sgr-glossario termo="Resposta ao Risco"></sgr-glossario>
+                                </th>
+                                <th md-column class="text-center" width="50px" ng-show="scope.permissao.criarEventoRisco && !scope.apenasLeitura">
+                                    <sgr-glossario termo="Ação"></sgr-glossario>
+                                </th>
+                            </tr>
+                            </thead>
+
+                            <tbody md-body>
+                            <tr md-row ng-repeat="item in scope._eventosRisco">
+                                <td md-cell class="text-center">
+                                    <span>{{scope.filtros.page*scope.filtros.size+$index+1}}</span>
+                                </td>
+                                <td md-cell>
+                                    <span>{{item.evento.descricao}}</span>
+                                </td>
+                                <td md-cell class="text-center">
+                                    <span>{{item.calculoRiscoResidual.nivel}}</span>
+                                </td>
+                                <td md-cell style="background: {{item.calculoRiscoResidual.nivel | corNivelRisco}}">
+                                    <strong style="color: black; font-size: 16px;font-weight: 600">{{item.calculoRiscoResidual.nivel | nivelRisco}}</strong>
+                                </td>
+                                <td md-cell>
+                                    <span>{{item.respostaRisco.nome}}</span>
+                                </td>
+                                <td md-cell class="text-center cell-options" ng-show="scope.permissao.criarEventoRisco && !scope.apenasLeitura">
+                                    <a ui-sref="processo.respostaRisco.editar({id: scope.processoId, eventoRiscoId: item.id})">
+                                        <md-tooltip md-direction="top">
+                                            Alterar
+                                        </md-tooltip>
+                                        <ng-md-icon icon="create"></ng-md-icon>
+                                    </a>
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </md-table-container>
+                    <md-table-pagination md-on-paginate="scope.filtrar" md-limit="scope.tamanhoLimite" md-limit-options="[20, 50, 100]" md-page="scope.registroInicial" md-total="{{scope.totalItems}}" md-page-select></md-table-pagination>
+                </md-card>
+            </div>
+        </div>
+
+

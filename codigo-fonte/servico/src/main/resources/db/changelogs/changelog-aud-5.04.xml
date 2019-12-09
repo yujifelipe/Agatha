@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="fabrica.wgl" id="5.04.1" labels="Inclusão da data de validação do processo">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE aud_gestaoriscos.tb_processo_aud ADD dt_validacao TIMESTAMP NULL;
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.04.2" labels="Alteração na tabela de Monitoramento">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud ADD ic_operador_conclusao BOOL NULL;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud ADD dt_inicio TIMESTAMP NULL;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud ADD dt_fim TIMESTAMP NULL;
+
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

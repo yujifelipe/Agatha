@@ -1,0 +1,523 @@
+<md-content flex>
+    <div class="sgr-container">
+
+        <div class="sgr-container-header" layout="row">
+            <div class="md-toolbar-tools">
+                <h3 style="font-size: 18px">
+                    <sgr-glossario termo="Monitoramento"></sgr-glossario>
+                </h3>
+            </div>
+        </div>
+
+        <v-accordion class="vAccordion--default">
+            <v-pane expanded="false">
+                <v-pane-header class="accordin-header-monitoramento">Selecionar Filtro</v-pane-header>
+                <v-pane-content class="accordin-body-monitoramento">
+
+                    <div class="sgr-container-table" layout="column">
+                        <md-card>
+                            <md-table-container>
+                                <table md-table>
+                                    <thead md-head>
+                                    <tr md-row>
+                                        <th md-column class="text-center" width="30px"></th>
+                                        <th md-column>
+                                            <sgr-glossario termo="Descrição"></sgr-glossario>
+                                        </th>
+                                        <th md-column width="70px">
+                                            <sgr-glossario termo="Data"></sgr-glossario>
+                                        </th>
+                                        <th md-column class="text-center" width="40px">
+                                            <sgr-glossario termo="Ação"></sgr-glossario>
+                                        </th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody md-body>
+
+                                    <tr md-row ng-repeat="item in scope._registros">
+                                        <td md-cell class="text-center">
+
+                                            <a ng-click="scope.findBy(item.id)" class="cursor-pointer no-padding">
+                                                <md-tooltip md-direction="top">
+                                                    Selecionar
+                                                </md-tooltip>
+                                                <ng-md-icon icon="check"></ng-md-icon>
+                                            </a>
+
+                                        </td>
+                                        <td md-cell>
+                                            <span ng-bind="item.nome"></span>
+                                        </td>
+                                        <td md-cell>
+                                            <span ng-bind="item.dtCadastro | date:'dd/MM/yyyy'"></span>
+                                        </td>
+
+                                        <td md-cell class="text-center cell-options">
+                                            <a ng-click="scope.excluirRegistro(item)" class="cursor-pointer no-padding">
+                                                <md-tooltip md-direction="top">
+                                                    Excluir
+                                                </md-tooltip>
+                                                <ng-md-icon icon="delete"></ng-md-icon>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr md-row ng-show="!scope._registros.length">
+                                        <td md-cell colspan="100%">
+                                            Nenhum filtro cadastrado
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </md-table-container>
+                            <md-table-pagination md-on-paginate="scope.filtrar" md-limit="scope.tamanhoLimite" md-limit-options="[20, 50, 100]" md-page="scope.registroInicial" md-total="{{scope.totalItems}}" md-page-select></md-table-pagination>
+                        </md-card>
+                    </div>
+
+                </v-pane-content>
+            </v-pane>
+        </v-accordion>
+
+        <div layout="row" layout-xs="column">
+
+            <div class="md-block padding-15" flex-gt-xs flex="40">
+
+                <form ng-cloak name="formRegistro" ng-submit="scope.persistir($event)" novalidate>
+
+                    <div layout="row" layout-xs="column" ng-show="scope.registro.id">
+
+                        <p style="margin-top: 0">Filtro Selecionado: <strong>{{scope.registro.nome}}</strong></p>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <md-input-container class="md-block" flex-gt-xs flex="100" ng-show="scope.usuarioLogado.isNucleo">
+                            <label>
+                                <sgr-glossario termo="Secretaria/Unidade"></sgr-glossario>
+                            </label>
+                            <md-select name="secretarias" ng-model="scope.registro.secretarias" placeholder="Secretaria/Unidade" data-md-container-class="selectdemoSelectHeader" ng-change="scope.gerarGrafico()" multiple required>
+                                <md-option ng-repeat="item in scope.orgaos" ng-value="item">
+                                    {{item.sigla}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex-gt-xs flex="100" ng-show="!scope.usuarioLogado.isNucleo">
+                            <label>
+                                <sgr-glossario termo="Secretaria/Unidade"></sgr-glossario>
+                            </label>
+                            <input ng-model="scope.usuarioLogado.permissao.orgao.nome" ng-disabled="true"/>
+                        </md-input-container>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <div class="md-label">
+                            <span class="switch-invert">
+                                E
+                            </span>
+                        </div>
+
+                        <md-switch class="md-primary no-margin switch-monitoramento" md-no-ink aria-label="E / OU" ng-model="scope.registro.operadorMacropocesso" flex-gt-xs flex="100" ng-change="scope.gerarGrafico()">
+                            OU
+                        </md-switch>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <md-input-container class="md-block" flex-gt-xs flex="100">
+                            <label>
+                                <sgr-glossario termo="Macroprocesso"></sgr-glossario>
+                            </label>
+                            <md-select name="macroprocessos" ng-model="scope.registro.macroprocessos" placeholder="Macroprocesso/Processos" multiple ng-change="scope.gerarGrafico()">
+                                <md-option ng-repeat="item in scope._macroprocessos" ng-value="item">
+                                    {{item.descricao}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <div class="md-label">
+                            <span class="switch-invert">
+                                E
+                            </span>
+                        </div>
+
+                        <md-switch class="md-primary no-margin switch-monitoramento" md-no-ink aria-label="E / OU" ng-model="scope.registro.operadorCategoria" flex-gt-xs flex="100" ng-change="scope.gerarGrafico()">
+                            OU
+                        </md-switch>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <md-input-container class="md-block" flex-gt-xs flex="100">
+                            <label>
+                                <sgr-glossario termo="Categoria de Risco"></sgr-glossario>
+                            </label>
+                            <md-select name="categorias" ng-model="scope.registro.categorias" placeholder="Categoria de Risco" multiple ng-change="scope.gerarGrafico()">
+                                <md-option ng-repeat="item in scope._categorias" ng-value="item">
+                                    {{item.descricao}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <div class="md-label">
+                            <span class="switch-invert">
+                                E
+                            </span>
+                        </div>
+
+                        <md-switch class="md-primary no-margin switch-monitoramento" md-no-ink aria-label="E / OU" ng-model="scope.registro.operadorIntegridade" flex-gt-xs flex="100" ng-change="scope.gerarGrafico()">
+                            OU
+                        </md-switch>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <md-input-container class="md-block" flex-gt-xs flex="100">
+                            <label>
+                                <sgr-glossario termo="Risco de Integridade"></sgr-glossario>
+                            </label>
+                            <md-select name="integridades" ng-model="scope.registro.integridades" placeholder="Risco de Integridade" multiple ng-change="scope.gerarGrafico()">
+                                <md-option ng-repeat="item in scope._integridades" ng-value="item.integridade">
+                                    {{item.descricao}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <div class="md-label">
+                            <span class="switch-invert">
+                                E
+                            </span>
+                        </div>
+
+                        <md-switch class="md-primary no-margin switch-monitoramento" md-no-ink aria-label="E / OU" ng-model="scope.registro.operadorNivelRisco" flex-gt-xs flex="100" ng-change="scope.gerarGrafico()">
+                            OU
+                        </md-switch>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <md-input-container class="md-block" flex-gt-xs flex="100">
+                            <label>
+                                <sgr-glossario termo="Nível do Risco"></sgr-glossario>
+                            </label>
+                            <md-select name="niveisRisco" ng-model="scope.registro.niveisRisco" placeholder="Nível do Risco" multiple ng-change="scope.gerarGrafico()">
+                                <md-option ng-repeat="item in scope._niveisRisco" ng-value="item">
+                                    {{item}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                    </div>
+
+                    <div layout="row" layout-xs="column">
+
+                        <div class="md-label">
+                            <span class="switch-invert">
+                                E
+                            </span>
+                        </div>
+
+                        <md-switch class="md-primary no-margin switch-monitoramento" md-no-ink aria-label="E / OU" ng-model="scope.registro.operadorResidual" flex-gt-xs flex="100" ng-change="scope.gerarGrafico()">
+                            OU
+                        </md-switch>
+
+                    </div>
+
+                    <monitoramento-risco titulo="Risco Residual" riscos="scope.registro.riscosResiduais" atualizar="scope.gerarGrafico()"></monitoramento-risco>
+
+                    <div layout="row" layout-xs="column" ng-show="scope.usuarioLogado.isNucleo">
+
+                        <div class="md-label">
+                            <span class="switch-invert">
+                                E
+                            </span>
+                        </div>
+
+                        <md-switch class="md-primary no-margin switch-monitoramento" md-no-ink aria-label="E / OU" ng-model="scope.registro.operadorInerente" flex-gt-xs flex="100" ng-change="scope.gerarGrafico()">
+                            OU
+                        </md-switch>
+
+                    </div>
+
+                    <monitoramento-risco titulo="Risco Inerente" riscos="scope.registro.riscosInerentes" atualizar="scope.gerarGrafico()" ng-show="scope.usuarioLogado.isNucleo"></monitoramento-risco>
+
+
+                    <div layout="row" layout-xs="column">
+
+                        <div class="md-label">
+                            <span class="switch-invert">
+                                E
+                            </span>
+                        </div>
+
+                        <md-switch class="md-primary no-margin switch-monitoramento" md-no-ink aria-label="E / OU" ng-model="scope.registro.operadorConclusao" flex-gt-xs flex="100" ng-change="scope.gerarGrafico()">
+                            OU
+                        </md-switch>
+
+                    </div>
+
+                    <fieldset class="fieldset-monitoramento">
+
+                        <legend class="LegendTamanhoTextoFieldset" style="line-height: 5px">
+                            <h3 class="text-center">
+                                <sgr-glossario termo="Data de Conclusão do Plano de Ação"></sgr-glossario>
+                            </h3>
+                        </legend>
+
+                        <div layout="row" layout-xs="column">
+
+                            <div class="md-block" flex-gt-xs flex="100">
+                                <span>
+                                    <sgr-glossario termo="Início"></sgr-glossario>
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div layout="row" layout-xs="column" class="m-b-10">
+
+                            <div class="md-block" flex-gt-xs flex="100">
+
+                                <md-datepicker-custom name="dtInicio" ng-model="scope.registro.dtInicio" md-max-date="scope.registro.dtFim" class="datepicker-minitoramento" ng-change="scope.gerarGrafico()"
+                                                      md-custom-required="false" md-custom-mask="39/19/9999" md-custom-clean-mask="false" md-custom-restrict="reject" ng-disabled="scope.apenasLeitura"></md-datepicker-custom>
+
+                                <div class="validation-messages" style="color:red; font-size: 12px">
+                                    <div ng-show="formRegistro.dtInicio.$error.valid">Escolha uma data válida!</div>
+                                    <div ng-show="formRegistro.dtInicio.$error.maxdate">Escolha uma data menor que a data fim</div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div layout="row" layout-xs="column">
+
+                            <div class="md-block" flex-gt-xs flex="100">
+                                <span>
+                                    <sgr-glossario termo="Fim"></sgr-glossario>
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div layout="row" layout-xs="column" class="m-b-10">
+
+                            <div class="md-block" flex-gt-xs flex="100">
+
+                                <md-datepicker-custom name="dtFim" ng-model="scope.registro.dtFim" md-min-date="scope.registro.dtInicio" class="datepicker-minitoramento" ng-change="scope.gerarGrafico()"
+                                                      md-custom-required="false" md-custom-mask="39/19/9999" md-custom-clean-mask="false" md-custom-restrict="reject" ng-disabled="scope.apenasLeitura"></md-datepicker-custom>
+
+                                <div class="validation-messages" style="color:red; font-size: 12px">
+                                    <div ng-show="formRegistro.dtFim.$error.valid">Escolha uma data válida!</div>
+                                    <div ng-show="formRegistro.dtFim.$error.mindate">Escolha uma data maior que a data de inicio</div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <div class="sgr-container-buttons m-t-20" layout="row" layout-xs="column">
+
+                        <md-button class="md-primary" type="button" flex-gt-xs flex="20" ng-click="scope.limparCadastro()">
+                            <md-icon md-font-set="material-icons">filter_list</md-icon>
+                            <sgr-glossario termo="Limpar"></sgr-glossario>
+                        </md-button>
+
+                        <md-button class="md-primary md-raised" type="submit" flex-gt-xs flex="35">
+                            <md-icon md-font-set="material-icons">done</md-icon>
+                            <sgr-glossario termo="Salvar Filtro"></sgr-glossario>
+                        </md-button>
+
+                        <md-button class="md-primary md-raised" type="button" flex-gt-xs flex="45" ng-click="scope.gerarRelatorio()">
+                            <md-icon md-font-set="material-icons">insert_chart</md-icon>
+                            <sgr-glossario termo="Gerar relatório"></sgr-glossario>
+                        </md-button>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="md-block padding-15" flex-gt-xs flex="60">
+
+                <div class="table-monitoramento" layout="column">
+                    <md-card>
+                        <md-table-container>
+                            <table md-table>
+                                <thead md-head>
+                                <tr md-row>
+                                    <th md-column class="text-center" width="20%">
+                                        <sgr-glossario termo="Macroprocessos"></sgr-glossario>
+                                    </th>
+                                    <th md-column class="text-center" width="20%">
+                                        <sgr-glossario termo="Processos"></sgr-glossario>
+                                    </th>
+                                    <th md-column class="text-center" width="20%">
+                                        <sgr-glossario termo="Riscos"></sgr-glossario>
+                                    </th>
+                                    <th md-column class="text-center" width="20%">
+                                        <sgr-glossario termo="Causas"></sgr-glossario>
+                                    </th>
+                                    <th md-column class="text-center" width="20%">
+                                        <sgr-glossario termo="Consequencias"></sgr-glossario>
+                                    </th>
+                                </tr>
+                                </thead>
+
+                                <tbody md-body>
+                                <tr md-row>
+                                    <td md-cell class="text-center">
+                                        {{scope._grafico.macroprocesso}}
+                                    </td>
+                                    <td md-cell class="text-center">
+                                        {{scope._grafico.processo}}
+                                    </td>
+                                    <td md-cell class="text-center">
+                                        {{scope._grafico.eventoRisco}}
+                                    </td>
+                                    <td md-cell class="text-center">
+                                        {{scope._grafico.causa}}
+                                    </td>
+                                    <td md-cell class="text-center">
+                                        {{scope._grafico.consequencia}}
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </md-table-container>
+                    </md-card>
+                </div>
+
+                <div layout="row" layout-xs="column">
+
+                    <div class="md-block" flex-gt-xs flex="100">
+                        <p class="monitoramento-warning">
+                            <sgr-glossario termo="* Apenas processos validados são contabilizados"></sgr-glossario>
+                        </p>
+                    </div>
+
+                </div>
+
+                <div layout="row" layout-xs="column" style="margin-top: 120px">
+
+                    <div class="md-block" flex-gt-xs flex="10"></div>
+
+                    <div class="md-block" flex-gt-xs flex="40">
+
+                        <h3 class="text-center">Nível de Risco Residual</h3>
+
+                        <canvas id="doughnut" class="chart chart-doughnut" chart-data="scope._riscoResidual.data" chart-labels="scope._riscoResidual.labels" chart-colors="scope.colors" height="200px"></canvas>
+                    </div>
+
+                    <div class="md-block" flex-gt-xs flex="50" style="align-self: center">
+
+                        <div layout="row" layout-xs="column">
+
+                            <div class="md-block m-b-10" flex-gt-xs flex="100">
+
+                                <span class="nivel-legenda nivel-baixo"></span>
+                                <span class="nivel-legenda-title">Pequeno (<strong>{{scope._riscoResidual.data[0]}}</strong>)</span>
+
+                            </div>
+
+                        </div>
+
+                        <div layout="row" layout-xs="column">
+
+                            <div class="md-block m-b-10" flex-gt-xs flex="100">
+
+                                <span class="nivel-legenda nivel-moderado"></span>
+                                <span class="nivel-legenda-title">Moderado (<strong>{{scope._riscoResidual.data[1]}}</strong>)</span>
+
+                            </div>
+
+                        </div>
+
+                        <div layout="row" layout-xs="column">
+
+                            <div class="md-block m-b-10" flex-gt-xs flex="100">
+
+                                <span class="nivel-legenda nivel-alto"></span>
+                                <span class="nivel-legenda-title">Alto (<strong>{{scope._riscoResidual.data[2]}}</strong>)</span>
+
+                            </div>
+
+                        </div>
+
+                        <div layout="row" layout-xs="column">
+
+                            <div class="md-block m-b-10" flex-gt-xs flex="100">
+
+                                <span class="nivel-legenda nivel-critico"></span>
+                                <span class="nivel-legenda-title">Crítico (<strong>{{scope._riscoResidual.data[3]}}</strong>)</span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div layout="row" layout-xs="column" style="margin-top: 160px">
+
+                    <div class="md-block" flex-gt-xs flex="10"></div>
+
+                    <div class="md-block" flex-gt-xs flex="40">
+
+                        <h3 class="text-center">Categoria de Risco</h3>
+
+                        <canvas id="bar" class="chart chart-bar" chart-data="scope._categoria.data" chart-labels="scope._categoria.itens" chart-options="scope.options" chart-colors="scope._categoria.colors" height="200px"></canvas>
+                    </div>
+
+                    <div class="md-block" flex-gt-xs flex="50" style="align-self: center">
+
+                        <div layout="row" layout-xs="column" ng-repeat="item in scope._categoria.labels track by $index">
+
+                            <div class="md-block m-b-20" flex-gt-xs flex="100">
+
+                                <p class="nivel-legenda-title">{{$index + 1}} - {{item}} (<strong>{{scope._categoria.data[$index]}}</strong>)</p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</md-content>
+

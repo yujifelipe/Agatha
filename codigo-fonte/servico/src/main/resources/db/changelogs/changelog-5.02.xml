@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="fabrica.wgl" id="5.02.1" labels="Adição da secretaria ao macroprocesso">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_macroprocesso ADD id_secretaria BIGINT NULL;
+
+            COMMENT ON COLUMN tb_macroprocesso.id_secretaria is 'Identificador da secretaria';
+
+            ALTER TABLE tb_macroprocesso ADD CONSTRAINT fk_tb_macroprocesso_tb_orgao FOREIGN KEY (id_secretaria) REFERENCES tb_orgao (id_orgao);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.2" labels="Adição do risco de integridade ao evento de risco">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_evento_risco ADD ic_risco_integridade bool NULL;
+
+            COMMENT ON COLUMN tb_evento_risco.ic_risco_integridade is 'Se o evento de risco possui risco de integridade';
+
+            UPDATE tb_evento_risco SET ic_risco_integridade = false;
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.3" labels="Remoção dos campos alterados da tabela de monitoramento">
+
+        <sql splitStatements="false">
+
+            DELETE FROM tb_monitoramento_secretaria;
+
+            DELETE FROM tb_monitoramento_macroprocesso;
+
+            DELETE FROM tb_monitoramento_categoria;
+
+            DELETE FROM tb_monitoramento;
+
+
+            ALTER TABLE tb_monitoramento DROP ic_integridade;
+
+            ALTER TABLE tb_monitoramento DROP ds_fator_residual;
+
+            ALTER TABLE tb_monitoramento DROP ds_nivel_residual;
+
+            ALTER TABLE tb_monitoramento DROP ds_fator_inerente;
+
+            ALTER TABLE tb_monitoramento DROP ds_nivel_inerente;
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.4" labels="Criação da tabela de Monitoramento de risco">
+
+        <sql splitStatements="false">
+
+            CREATE SEQUENCE sk_monitoramento_risco START WITH 1;
+            CREATE TABLE tb_monitoramento_risco
+            (
+            id_monitoramento_risco BIGINT PRIMARY KEY NOT NULL,
+            ic_excluido BOOLEAN DEFAULT false NOT NULL,
+            ds_fator VARCHAR(35) NOT NULL,
+            ds_niveis VARCHAR(10) NOT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_monitoramento_risco is 'Tabela responsável por armazenar os riscos de um monitoramento';
+            COMMENT ON COLUMN tb_monitoramento_risco.id_monitoramento_risco is 'Identificador do registro';
+            COMMENT ON COLUMN tb_monitoramento_risco.ic_excluido is 'Identifica se o registro está excluído';
+            COMMENT ON COLUMN tb_monitoramento_risco.ds_fator is 'Descrição do fator de risco';
+            COMMENT ON COLUMN tb_monitoramento_risco.ds_niveis is 'Valores dos níveis de risco';
+
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.5" labels="Criação da tabela associativa de monitoramento e monitoramento de risco residual">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE tb_monitoramento_risco_residual
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_monitoramento_risco BIGINT NOT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_monitoramento_risco_residual is 'Tabela associativa para armazenar os identificadores de monitoramento e monitoramento de risco residual';
+            COMMENT ON COLUMN tb_monitoramento_risco_residual.id_monitoramento is 'Identificador do monitoramento';
+            COMMENT ON COLUMN tb_monitoramento_risco_residual.id_monitoramento_risco is 'Identificador do monitoramento de risco residual';
+
+            ALTER TABLE tb_monitoramento_risco_residual ADD CONSTRAINT tb_monitoramento_risco_residual_pkey PRIMARY KEY (id_monitoramento, id_monitoramento_risco);
+
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.6" labels="Criação da tabela associativa de monitoramento e monitoramento de risco inerente">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE tb_monitoramento_risco_inerente
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_monitoramento_risco BIGINT NOT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_monitoramento_risco_inerente is 'Tabela associativa para armazenar os identificadores de monitoramento e monitoramento de risco inerente';
+            COMMENT ON COLUMN tb_monitoramento_risco_inerente.id_monitoramento is 'Identificador do monitoramento';
+            COMMENT ON COLUMN tb_monitoramento_risco_inerente.id_monitoramento_risco is 'Identificador do monitoramento de risco inerente';
+
+            ALTER TABLE tb_monitoramento_risco_inerente ADD CONSTRAINT tb_monitoramento_risco_inerente_pkey PRIMARY KEY (id_monitoramento, id_monitoramento_risco);
+
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.7" labels="Correção na tabela de Monitoramento">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_monitoramento ADD ic_operador_nivel_risco bool NULL;
+
+            COMMENT ON COLUMN tb_monitoramento.ic_operador_nivel_risco is 'Operador lógico do campo nível de risco (E = false, OU = true)';
+
+
+            ALTER TABLE tb_monitoramento ADD ds_integridades VARCHAR(10) NULL;
+
+            COMMENT ON COLUMN tb_monitoramento.ds_integridades is 'Se o evento de risco possui risco de integridade';
+
+
+            ALTER TABLE tb_monitoramento ADD ds_niveis_risco VARCHAR(35) NULL;
+
+            COMMENT ON COLUMN tb_monitoramento.ds_niveis_risco is 'Níveis de risco';
+
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

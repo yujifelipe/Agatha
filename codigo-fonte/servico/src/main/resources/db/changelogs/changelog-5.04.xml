@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="fabrica.wgl" id="5.04.1" labels="Inclusão da exclusão lógica de usuário">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_usuario ADD ic_excluido bool NULL;
+
+            UPDATE tb_usuario SET ic_excluido = false;
+
+            ALTER TABLE tb_usuario ALTER COLUMN ic_excluido SET NOT NULL;
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.04.2" labels="Remoção da unique key da coluna de cpf de usuário">
+
+        <sql splitStatements="false">
+
+            DROP INDEX gestaoriscos.uq_usuario_cpf RESTRICT;
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.04.3" labels="Inclusão da data de validação do processo">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_processo ADD dt_validacao TIMESTAMP NULL;
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.04.4" labels="Criação da tabela de Historico de Evento de Risco">
+
+        <sql splitStatements="false">
+
+            CREATE SEQUENCE sk_historico_evento_risco START WITH 1;
+            CREATE TABLE tb_historico_evento_risco
+            (
+            id_historico_evento_risco BIGINT PRIMARY KEY NOT NULL,
+            ic_excluido BOOLEAN DEFAULT false NOT NULL,
+            dt_cadastro TIMESTAMP NOT NULL,
+            ds_evento VARCHAR(1000) NOT NULL,
+            id_evento_risco BIGINT NOT NULL,
+            id_usuario BIGINT NOT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_historico_evento_risco is 'Tabela responsável por armazenar o histórico do evento de risco';
+            COMMENT ON COLUMN tb_historico_evento_risco.id_historico_evento_risco is 'Identificador do registro';
+            COMMENT ON COLUMN tb_historico_evento_risco.ic_excluido is 'Identifica se o registro está excluído';
+            COMMENT ON COLUMN tb_historico_evento_risco.dt_cadastro is 'Data de cadastro do registro';
+            COMMENT ON COLUMN tb_historico_evento_risco.ds_evento is 'Evento de risco alterado';
+            COMMENT ON COLUMN tb_historico_evento_risco.id_evento_risco is 'Identificador do evento de risco';
+            COMMENT ON COLUMN tb_historico_evento_risco.id_usuario is 'Identificador do usuário que alterou o evento de risco';
+
+
+            ALTER TABLE tb_historico_evento_risco ADD CONSTRAINT fk_tb_historico_evento_risco_tb_evento_risco FOREIGN KEY (id_evento_risco) REFERENCES tb_evento_risco (id_evento_risco);
+
+            ALTER TABLE tb_historico_evento_risco ADD CONSTRAINT fk_tb_historico_evento_risco_tb_usuario FOREIGN KEY (id_usuario) REFERENCES tb_usuario (id_usuario);
+
+        </sql>
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.04.5" labels="Criação da tabela de Historico de Evento de Risco">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_evento_risco ADD dt_atualizacao TIMESTAMP NULL;
+
+        </sql>
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.04.6" labels="Alteração na tabela de Monitoramento">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_monitoramento ADD ic_operador_conclusao BOOL NULL;
+
+            ALTER TABLE tb_monitoramento ADD dt_inicio TIMESTAMP NULL;
+
+            ALTER TABLE tb_monitoramento ADD dt_fim TIMESTAMP NULL;
+
+            COMMENT ON COLUMN tb_monitoramento.ic_operador_conclusao is 'Operador lógico da data de conclusão (E = false, OU = true)';
+            COMMENT ON COLUMN tb_monitoramento.dt_inicio is 'Data de início do período de conclusão';
+            COMMENT ON COLUMN tb_monitoramento.dt_fim is 'Data de fim do período de conclusão';
+
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
