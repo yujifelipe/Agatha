@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="fabrica.wgl" id="5.02.1" labels="Adição da secretaria ao macroprocesso">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE aud_gestaoriscos.tb_macroprocesso_aud ADD id_secretaria BIGINT NULL;
+
+        </sql>
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.2" labels="Adição do risco de integridade ao evento de risco">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE aud_gestaoriscos.tb_evento_risco_aud ADD ic_risco_integridade bool NULL;
+
+        </sql>
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.3" labels="Remoção dos campos alterados da tabela de monitoramento">
+
+        <sql splitStatements="false">
+
+            DELETE FROM aud_gestaoriscos.tb_monitoramento_secretaria_aud;
+
+            DELETE FROM aud_gestaoriscos.tb_monitoramento_macroprocesso_aud;
+
+            DELETE FROM aud_gestaoriscos.tb_monitoramento_categoria_aud;
+
+            DELETE FROM aud_gestaoriscos.tb_monitoramento_aud;
+
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud DROP ic_integridade;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud DROP ds_fator_residual;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud DROP ds_nivel_residual;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud DROP ds_fator_inerente;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud DROP ds_nivel_inerente;
+
+        </sql>
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.4" labels="Criação da tabela de Monitoramento de risco">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE aud_gestaoriscos.tb_monitoramento_risco_aud
+            (
+            id_monitoramento_risco BIGINT NOT NULL,
+            rev int4 NOT NULL,
+            revtype int2,
+            ds_fator VARCHAR(35) NOT NULL,
+            ds_niveis VARCHAR(10) NOT NULL
+            ) ;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_risco_aud ADD CONSTRAINT tb_monitoramento_risco_aud_pkey PRIMARY KEY (id_monitoramento_risco, rev);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.5" labels="Criação da tabela associativa de monitoramento e monitoramento de risco residual">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE aud_gestaoriscos.tb_monitoramento_risco_residual_aud
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_monitoramento_risco BIGINT NOT NULL,
+            rev int4 NOT NULL,
+            revtype int2
+            ) ;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_risco_residual_aud ADD CONSTRAINT tb_monitoramento_risco_residual_aud_pkey PRIMARY KEY (id_monitoramento, id_monitoramento_risco, rev);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.6" labels="Criação da tabela associativa de monitoramento e monitoramento de risco inerente">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE aud_gestaoriscos.tb_monitoramento_risco_inerente_aud
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_monitoramento_risco BIGINT NOT NULL,
+            rev int4 NOT NULL,
+            revtype int2
+            ) ;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_risco_inerente_aud ADD CONSTRAINT tb_monitoramento_risco_inerente_aud_pkey PRIMARY KEY (id_monitoramento, id_monitoramento_risco, rev);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.02.7" labels="Correção na tabela de Monitoramento">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud ADD ic_operador_nivel_risco bool NULL;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud ADD ds_integridades VARCHAR(10) NULL;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud ADD ds_niveis_risco VARCHAR(35) NULL;
+
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

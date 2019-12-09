@@ -1,0 +1,107 @@
+<fieldset class="fieldset-monitoramento">
+
+    <legend class="LegendTamanhoTextoFieldset" style="line-height: 5px">
+        <h3 class="text-center">
+            <sgr-glossario termo="{{titulo}}"></sgr-glossario>
+        </h3>
+    </legend>
+
+        <div layout="row" layout-xs="column">
+
+            <md-input-container class="md-block" flex-gt-xs flex="100" style="margin: 0 0 10px 0">
+                <label>
+                    <sgr-glossario termo="Fatores de Análise - Impacto"></sgr-glossario>
+                </label>
+                <md-select name="fator" ng-model="fator" placeholder="Fatores de Análise - Impacto">
+                    <md-option ng-repeat="item in _fatores" ng-value="item.fator">
+                        {{item.descricao}}
+                    </md-option>
+                </md-select>
+            </md-input-container>
+
+        </div>
+
+        <div layout="row" layout-xs="column">
+
+            <md-input-container class="md-block" flex-gt-xs flex="100" style="margin: 0 0 10px 0">
+                <label>
+                    <sgr-glossario termo="Nível"></sgr-glossario>
+                </label>
+                <md-select name="nivel" ng-model="niveis" placeholder="Nível" multiple>
+                    <md-option ng-repeat="item in _niveis" ng-value="item.nivel">
+                        {{item.descricao}}
+                    </md-option>
+                </md-select>
+            </md-input-container>
+
+        </div>
+
+        <div layout="row" layout-xs="column" layout-align="end">
+
+            <section layout="row center" layout-sm="column" layout-wrap flex-gt-xs flex="30">
+
+                <div layout="row" layout-align="space-around center" class="full-width">
+
+                    <md-button class="md-primary md-raised full-width" type="button" ng-click="adicionarRisco()">
+                        <md-icon md-font-set="material-icons">add</md-icon>
+                        <sgr-glossario termo="Incluir"></sgr-glossario>
+                    </md-button>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    <div class="sgr-container-table" layout="column" ng-show="riscos.length">
+        <md-card>
+            <md-table-container>
+                <table md-table>
+                    <thead md-head>
+                    <tr md-row>
+                        <th md-column class="text-center" width="30px">
+                            Item
+                        </th>
+                        <th md-column>
+                            <sgr-glossario termo="Fator da Análise"></sgr-glossario>
+                        </th>
+                        <th md-column width="70px">
+                            <sgr-glossario termo="Nível"></sgr-glossario>
+                        </th>
+                        <th md-column class="text-center" width="40px">
+                            <sgr-glossario termo="Ação"></sgr-glossario>
+                        </th>
+                    </tr>
+                    </thead>
+
+                    <tbody md-body>
+
+                    <tr md-row ng-repeat="item in riscos">
+                        <td md-cell class="text-center">
+                            {{$index + 1}}
+                        </td>
+                        <td md-cell>
+                            <span ng-bind="item.fator"></span>
+                        </td>
+                        <td md-cell>
+                            <span ng-bind="item.niveis.join()"></span>
+                        </td>
+
+                        <td md-cell class="text-center cell-options">
+                            <a class="cursor-pointer no-padding" ng-click="removerRisco($index)">
+                                <md-tooltip md-direction="top">
+                                    Excluir
+                                </md-tooltip>
+                                <ng-md-icon icon="delete"></ng-md-icon>
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+                </table>
+            </md-table-container>
+        </md-card>
+    </div>
+
+</fieldset>

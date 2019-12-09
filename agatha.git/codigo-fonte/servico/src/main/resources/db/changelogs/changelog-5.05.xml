@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="fabrica.wgl" id="5.05.1" labels="Alteração da tabela de acompanhamento">
+
+        <sql splitStatements="false">
+
+            DELETE FROM tb_acompanhamento;
+
+
+            ALTER TABLE tb_acompanhamento DROP CONSTRAINT fk_tb_acompanhamento_tb_evento_risco;
+
+            ALTER TABLE tb_acompanhamento DROP id_evento_risco;
+
+
+            ALTER TABLE tb_acompanhamento ADD id_plano_controle BIGINT NOT NULL;
+
+            COMMENT ON COLUMN tb_acompanhamento.id_plano_controle is 'Identificador do Plano de Controle';
+
+            ALTER TABLE tb_acompanhamento ADD CONSTRAINT fk_tb_acompanhamento_tb_plano_controle FOREIGN KEY (id_plano_controle) REFERENCES tb_plano_controle (id_plano_controle);
+
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="fabrica.wgl" id="5.01.1" labels="Criação da tabela de Monitoramento">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE aud_gestaoriscos.tb_monitoramento_aud
+            (
+            id_monitoramento BIGINT NOT NULL,
+            rev int4 NOT NULL,
+            revtype int2,
+            dt_cadastro TIMESTAMP NULL,
+            no_monitoramento VARCHAR(255) NOT NULL,
+            ic_operador_secretaria bool NULL,
+            ic_operador_macroprocesso bool NULL,
+            ic_operador_categoria bool NULL,
+            ic_integridade bool NULL,
+            ic_operador_integridade bool NULL,
+            ds_fator_residual VARCHAR(30) NULL,
+            ds_nivel_residual VARCHAR(30) NULL,
+            ic_operador_residual bool NULL,
+            ds_fator_inerente VARCHAR(30) NULL,
+            ds_nivel_inerente VARCHAR(30) NULL,
+            id_orgao BIGINT NULL
+            ) ;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud ADD CONSTRAINT tb_monitoramento_aud_pkey PRIMARY KEY (id_monitoramento, rev);
+
+        </sql>
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.01.2" labels="Criação da tabela associativa de monitoramento e órgão">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE aud_gestaoriscos.tb_monitoramento_secretaria_aud
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_secretaria BIGINT NOT NULL,
+            rev int4 NOT NULL,
+            revtype int2
+            ) ;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_secretaria_aud ADD CONSTRAINT tb_monitoramento_secretaria_aud_pkey PRIMARY KEY (id_monitoramento, id_secretaria, rev);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.01.3" labels="Criação da tabela associativa de monitoramento e macroprocesso">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE aud_gestaoriscos.tb_monitoramento_macroprocesso_aud
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_macroprocesso BIGINT NOT NULL,
+            rev int4 NOT NULL,
+            revtype int2
+            ) ;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_macroprocesso_aud ADD CONSTRAINT tb_monitoramento_macroprocesso_aud_pkey PRIMARY KEY (id_monitoramento, id_macroprocesso, rev);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.01.4" labels="Criação da tabela associativa de monitoramento e categoria">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE aud_gestaoriscos.tb_monitoramento_categoria_aud
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_categoria BIGINT NOT NULL,
+            rev int4 NOT NULL,
+            revtype int2
+            ) ;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_categoria_aud ADD CONSTRAINT tb_monitoramento_categoria_aud_pkey PRIMARY KEY (id_monitoramento, id_categoria, rev);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.01.5" labels="Correção na tabela de Monitoramento">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud RENAME ic_operador_secretaria TO ic_operador_inerente;
+
+            ALTER TABLE aud_gestaoriscos.tb_monitoramento_aud ADD ic_perfil_nucleo bool NULL;
+
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

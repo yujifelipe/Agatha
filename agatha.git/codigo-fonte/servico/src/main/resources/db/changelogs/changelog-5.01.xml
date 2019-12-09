@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="fabrica.wgl" id="5.01.1" labels="Criação da tabela de Monitoramento">
+
+        <sql splitStatements="false">
+
+            CREATE SEQUENCE sk_monitoramento START WITH 1;
+            CREATE TABLE tb_monitoramento
+            (
+            id_monitoramento BIGINT PRIMARY KEY NOT NULL,
+            ic_excluido BOOLEAN DEFAULT false NOT NULL,
+            dt_cadastro TIMESTAMP NULL,
+            no_monitoramento VARCHAR(255) NOT NULL,
+            ic_operador_secretaria bool NULL,
+            ic_operador_macroprocesso bool NULL,
+            ic_operador_categoria bool NULL,
+            ic_integridade bool NULL,
+            ic_operador_integridade bool NULL,
+            ds_fator_residual VARCHAR(30) NULL,
+            ds_nivel_residual VARCHAR(30) NULL,
+            ic_operador_residual bool NULL,
+            ds_fator_inerente VARCHAR(30) NULL,
+            ds_nivel_inerente VARCHAR(30) NULL,
+            id_orgao BIGINT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_monitoramento is 'Tabela responsável por armazenar os filtros do gráfico de monitoramento';
+            COMMENT ON COLUMN tb_monitoramento.id_monitoramento is 'Identificador do filtro de monitoramento';
+            COMMENT ON COLUMN tb_monitoramento.ic_excluido is 'Identifica se o registro está excluído';
+            COMMENT ON COLUMN tb_monitoramento.dt_cadastro is 'Data de cadastro do registro';
+            COMMENT ON COLUMN tb_monitoramento.no_monitoramento is 'Nome do monitoramento';
+            COMMENT ON COLUMN tb_monitoramento.ic_operador_secretaria is 'Operador lógico do combo de secretarias (E = false, OU = true)';
+            COMMENT ON COLUMN tb_monitoramento.ic_operador_macroprocesso is 'Operador lógico do combo de macroprocessos (E = false, OU = true)';
+            COMMENT ON COLUMN tb_monitoramento.ic_operador_categoria is 'Operador lógico do combo de categorias (E = false, OU = true)';
+            COMMENT ON COLUMN tb_monitoramento.ic_integridade is 'Se o monitoramento deverá filtrar por risco de integridade';
+            COMMENT ON COLUMN tb_monitoramento.ic_operador_integridade is 'Operador lógico do campo de risco de integridade (E = false, OU = true)';
+            COMMENT ON COLUMN tb_monitoramento.ds_fator_residual is 'Fator do risco residual';
+            COMMENT ON COLUMN tb_monitoramento.ds_fator_residual is 'Nivel do risco residual';
+            COMMENT ON COLUMN tb_monitoramento.ic_operador_residual is 'Operador lógico do risco residual (E = false, OU = true)';
+            COMMENT ON COLUMN tb_monitoramento.ds_fator_inerente is 'Fator do risco inerente';
+            COMMENT ON COLUMN tb_monitoramento.ds_nivel_inerente is 'Nivel do risco inerente';
+            COMMENT ON COLUMN tb_monitoramento.id_orgao is 'Identificador da secretária da qual o filtro pertence';
+
+
+            ALTER TABLE tb_monitoramento ADD CONSTRAINT fk_tb_monitoramento_tb_orgao FOREIGN KEY (id_monitoramento) REFERENCES tb_orgao (id_orgao);
+
+        </sql>
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.01.2" labels="Criação da tabela associativa de monitoramento e órgão">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE tb_monitoramento_secretaria
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_secretaria BIGINT NOT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_monitoramento_secretaria is 'Tabela associativa para armazenar os identificadores de monitoramento e órgão';
+            COMMENT ON COLUMN tb_monitoramento_secretaria.id_monitoramento is 'Identificador de monitoramento';
+            COMMENT ON COLUMN tb_monitoramento_secretaria.id_secretaria is 'Identificador de órgão';
+
+            ALTER TABLE tb_monitoramento_secretaria ADD CONSTRAINT tb_monitoramento_secretaria_pkey PRIMARY KEY (id_monitoramento, id_secretaria);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.01.3" labels="Criação da tabela associativa de monitoramento e macroprocesso">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE tb_monitoramento_macroprocesso
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_macroprocesso BIGINT NOT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_monitoramento_macroprocesso is 'Tabela associativa para armazenar os identificadores de monitoramento e macroprocesso';
+            COMMENT ON COLUMN tb_monitoramento_macroprocesso.id_monitoramento is 'Identificador de monitoramento';
+            COMMENT ON COLUMN tb_monitoramento_macroprocesso.id_macroprocesso is 'Identificador de macroprocesso';
+
+            ALTER TABLE tb_monitoramento_macroprocesso ADD CONSTRAINT tb_monitoramento_macroprocesso_pkey PRIMARY KEY (id_monitoramento, id_macroprocesso);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.01.4" labels="Criação da tabela associativa de monitoramento e categoria">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE tb_monitoramento_categoria
+            (
+            id_monitoramento BIGINT NOT NULL,
+            id_categoria BIGINT NOT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_monitoramento_categoria is 'Tabela associativa para armazenar os identificadores de monitoramento e órgão';
+            COMMENT ON COLUMN tb_monitoramento_categoria.id_monitoramento is 'Identificador de monitoramento';
+            COMMENT ON COLUMN tb_monitoramento_categoria.id_categoria is 'Identificador de categoria';
+
+            ALTER TABLE tb_monitoramento_categoria ADD CONSTRAINT tb_monitoramento_categoria_pkey PRIMARY KEY (id_monitoramento, id_categoria);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.01.5" labels="Correção na tabela de Monitoramento">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_monitoramento RENAME ic_operador_secretaria TO ic_operador_inerente;
+
+            COMMENT ON COLUMN tb_monitoramento.ic_operador_inerente is 'Operador lógico do risco inerente (E = false, OU = true)';
+
+
+            ALTER TABLE tb_monitoramento ADD ic_perfil_nucleo bool NULL;
+
+            COMMENT ON COLUMN tb_monitoramento.ic_perfil_nucleo is 'Se o monitoramento foi criado ou editado por um usuário com perfil de núcleo';
+
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,11 @@
+codigo-fonte/cliente/bower_components/
+codigo-fonte/cliente/node_modules/
+codigo-fonte/cliente/.tmp/
+codigo-fonte/cliente/.idea/
+codigo-fonte/servico/target/
+*.iml
+.idea/
+codigo-fonte/cliente/dist/
+codigo-fonte/servico/logs/
+docker/spring/app.jar
+logs

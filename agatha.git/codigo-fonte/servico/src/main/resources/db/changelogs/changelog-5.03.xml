@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="fabrica.wgl" id="5.03.1" labels="Remoção da tabela de tipo de calculadora">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_calculadora DROP CONSTRAINT fk_tb_calculadora_tb_tipo_calculadora;
+
+            ALTER TABLE tb_calculadora DROP id_tipo_calculadora;
+
+            DROP TABLE tb_tipo_calculadora;
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.03.2" labels="Criação do identificador da calculadora base">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_calculadora ADD ic_calculadora_base bool NULL;
+
+            COMMENT ON COLUMN tb_calculadora.ic_calculadora_base is 'Identificador se a calculadora é a base para as demais calculadoras';
+
+
+            UPDATE tb_calculadora SET ic_calculadora_base = false;
+
+            UPDATE tb_calculadora SET ic_calculadora_base = true WHERE id_processo IS NULL;
+
+
+            ALTER TABLE tb_calculadora ALTER COLUMN ic_calculadora_base SET NOT NULL;
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.03.3" labels="Alteração do relacionamento de calculadora - processo">
+
+        <sql splitStatements="false">
+
+            ALTER TABLE tb_processo ADD id_calculadora bigint NULL;
+
+            COMMENT ON COLUMN tb_processo.id_calculadora is 'Identificador da calculadora';
+
+            ALTER TABLE tb_processo ADD CONSTRAINT fk_tb_processo_tb_calculadora FOREIGN KEY (id_calculadora) REFERENCES tb_calculadora (id_calculadora);
+
+            update tb_processo set id_calculadora = (select tb_calculadora.id_calculadora from tb_calculadora where id_processo = tb_processo.id_processo order by id_processo ASC limit 1);
+
+
+
+            ALTER TABLE tb_calculadora DROP CONSTRAINT fk_tb_calculadora_tb_processo;
+
+            ALTER TABLE tb_calculadora DROP id_processo;
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.03.4" labels="Criação da tabela de Acompanhamento">
+
+        <sql splitStatements="false">
+
+            CREATE SEQUENCE sk_acompanhamento START WITH 1;
+            CREATE TABLE tb_acompanhamento
+            (
+            id_acompanhamento BIGINT PRIMARY KEY NOT NULL,
+            ic_excluido BOOLEAN DEFAULT false NOT NULL,
+            dt_cadastro TIMESTAMP NOT NULL,
+            ds_status VARCHAR(10) NOT NULL,
+            ds_implementado VARCHAR(15) NOT NULL,
+            ds_justificativa VARCHAR(500) NULL,
+            id_evento_risco BIGINT NOT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_acompanhamento is 'Tabela responsável por armazenar os filtros do gráfico de monitoramento';
+            COMMENT ON COLUMN tb_acompanhamento.id_acompanhamento is 'Identificador do registro';
+            COMMENT ON COLUMN tb_acompanhamento.ic_excluido is 'Identifica se o registro está excluído';
+            COMMENT ON COLUMN tb_acompanhamento.dt_cadastro is 'Data de cadastro do registro';
+            COMMENT ON COLUMN tb_acompanhamento.ds_status is 'Status do acompanhamento';
+            COMMENT ON COLUMN tb_acompanhamento.ds_implementado is 'Se o acompanhamento foi implementado';
+            COMMENT ON COLUMN tb_acompanhamento.ds_justificativa is 'Justificativa do acompanhamento';
+            COMMENT ON COLUMN tb_acompanhamento.id_evento_risco is 'Identificador do evento de risco';
+
+
+            ALTER TABLE tb_acompanhamento ADD CONSTRAINT fk_tb_acompanhamento_tb_evento_risco FOREIGN KEY (id_acompanhamento) REFERENCES tb_evento_risco (id_evento_risco);
+
+        </sql>
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.03.5" labels="Criação da tabela associativa de acompanhamento e arquivo anexo">
+
+        <sql splitStatements="false">
+
+            CREATE TABLE tb_acompanhamento_anexo
+            (
+            id_acompanhamento BIGINT NOT NULL,
+            id_anexo BIGINT NOT NULL
+            ) ;
+
+            COMMENT ON TABLE tb_acompanhamento_anexo is 'Tabela associativa para armazenar os identificadores de acompanhamento e arquivo anexo';
+            COMMENT ON COLUMN tb_acompanhamento_anexo.id_acompanhamento is 'Identificador de acompanhamento';
+            COMMENT ON COLUMN tb_acompanhamento_anexo.id_anexo is 'Identificador de arquivo anexo';
+
+            ALTER TABLE tb_acompanhamento_anexo ADD CONSTRAINT tb_acompanhamento_anexo_pkey PRIMARY KEY (id_acompanhamento, id_anexo);
+
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="fabrica.wgl" id="5.03.6" labels="Correção da FK de acompanhamento">
+
+        <sql splitStatements="false">
+
+            DELETE FROM tb_acompanhamento;
+
+            ALTER TABLE tb_acompanhamento DROP CONSTRAINT fk_tb_acompanhamento_tb_evento_risco;
+
+            ALTER TABLE tb_acompanhamento ADD CONSTRAINT fk_tb_acompanhamento_tb_evento_risco FOREIGN KEY (id_evento_risco) REFERENCES tb_evento_risco (id_evento_risco);
+
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>
